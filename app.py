@@ -4,11 +4,30 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import gradio as gr
 
 
+MODEL_ENV_VARS = ["MODEL_PATH", "MODEL_NAME"]
+
+
 def load_model():
-    model_name = os.getenv("MODEL_NAME", "openlm-research/open_llama_3b")
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32)
-    model.to('cuda' if torch.cuda.is_available() else 'cpu')
+    """Load the language model specified by environment variables.
+
+    ``MODEL_PATH`` takes precedence over ``MODEL_NAME``. Both can point to a local
+    directory containing the model files or a model ID from Hugging Face.
+    """
+
+    model_source = None
+    for var in MODEL_ENV_VARS:
+        if var in os.environ:
+            model_source = os.environ[var]
+            break
+    if model_source is None:
+        model_source = "openlm-research/open_llama_3b"
+
+    tokenizer = AutoTokenizer.from_pretrained(model_source)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_source,
+        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+    )
+    model.to("cuda" if torch.cuda.is_available() else "cpu")
     return model, tokenizer
 
 model, tokenizer = load_model()
