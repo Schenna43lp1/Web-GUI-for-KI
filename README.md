@@ -24,7 +24,18 @@ By default the script loads the `openlm-research/open_llama_3b` model from Huggi
 MODEL_NAME=meta-llama/Llama-2-7b-chat-hf python app.py
 ```
 
+Alternatively, point the application at a model stored on disk using
+`MODEL_PATH`:
+
+```bash
+huggingface-cli download openlm-research/open_llama_3b --local-dir ./models/open_llama_3b
+MODEL_PATH=./models/open_llama_3b python app.py
+```
+
 The web interface will start and provide a simple chat view similar to ChatGPT.
+
+To run completely offline, ensure the model is available locally and set
+`TRANSFORMERS_OFFLINE=1` before launching the app.
 
 ## Notes
 
